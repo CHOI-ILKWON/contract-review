@@ -1,5 +1,7 @@
 "use client";
 
+import { type ReactElement } from "react";
+
 const P = 5; // pixel size
 
 type Status = "standby" | "working" | "done";
@@ -113,7 +115,7 @@ const CHARACTERS: Record<string, CharDef> = {
 };
 
 function renderGrid(char: CharDef, isGray: boolean) {
-  const rects: JSX.Element[] = [];
+  const rects: ReactElement[] = [];
   char.grid.forEach((row, rowIdx) => {
     [...row].forEach((code, colIdx) => {
       if (code === "." || code === " ") return;
