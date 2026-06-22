@@ -8,6 +8,7 @@ export default function Home() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [context, setContext] = useState("");
+  const [contractType, setContractType] = useState("EPC");
   const [isDragging, setIsDragging] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -60,6 +61,7 @@ export default function Home() {
 
       sessionStorage.setItem("contractText", extractedText);
       sessionStorage.setItem("userContext", context);
+      sessionStorage.setItem("contractType", contractType);
       sessionStorage.setItem("fileNames", files.map((f) => f.name).join(", "));
 
       router.push("/review");
@@ -145,6 +147,33 @@ export default function Home() {
             </div>
           )}
 
+          {/* Contract type selector */}
+          <div className="space-y-2">
+            <label className="text-gray-500 font-mono text-xs">[계약 유형 선택 — 필수]</label>
+            <div className="grid grid-cols-5 gap-2">
+              {[
+                { value: "EPC", label: "EPC", desc: "설계·조달·시공" },
+                { value: "OM", label: "O&M", desc: "운영·유지보수" },
+                { value: "SUBCONTRACT", label: "하도급", desc: "Subcontract" },
+                { value: "LOI", label: "LOI·MOU", desc: "확약서" },
+                { value: "OTHER", label: "기타", desc: "Other" },
+              ].map((t) => (
+                <button
+                  key={t.value}
+                  onClick={() => setContractType(t.value)}
+                  className={`py-2 px-2 rounded border font-mono text-xs transition-all text-center ${
+                    contractType === t.value
+                      ? "border-green-500 bg-green-950 text-green-400"
+                      : "border-gray-700 bg-gray-900 text-gray-500 hover:border-gray-600"
+                  }`}
+                >
+                  <div className="font-bold">{t.label}</div>
+                  <div className="text-gray-600 text-xs mt-0.5">{t.desc}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Context input */}
           <div className="space-y-2">
             <label className="text-gray-500 font-mono text-xs">[참고 정보 입력 — 선택]</label>
@@ -182,7 +211,8 @@ export default function Home() {
             <p className="text-gray-600 font-mono text-xs font-bold">HOW IT WORKS</p>
             <p className="text-gray-600 font-mono text-xs">① 계약서 파일 자동 파싱 (텍스트 추출)</p>
             <p className="text-gray-600 font-mono text-xs">② 기술사 CHOI → 변호사 KIM → 사업개발자 LEE 순차 검토</p>
-            <p className="text-gray-600 font-mono text-xs">③ 3자 교차 검증 회의 → QA → CEO 보고서 생성</p>
+            <p className="text-gray-600 font-mono text-xs">③ 3자 교차 검증 → 사업개요 / 리스크 요약 / 리스크 세부사항 3섹션 보고서 생성</p>
+            <p className="text-gray-600 font-mono text-xs">④ 당사 절대원칙 기준 🔴 KEY RISK / 🟡 NORMAL RISK 분류</p>
           </div>
         </div>
       </main>

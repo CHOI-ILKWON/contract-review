@@ -21,13 +21,13 @@ const AGENTS: AgentState[] = [
   { id: "lee", name: "사업개발자 LEE", role: "사업구조·재무·누락조항", status: "standby", emoji: "📊" },
 ];
 
-const TAB_LABELS = ["1. 사업개요", "2. 사업구도", "3. 재무분석", "4. 검토요약", "5. 상세검토"];
+const TAB_LABELS = ["1. 사업개요", "2. 리스크 요약", "3. 리스크 세부"];
 
 function extractSection(report: string, sectionNum: number): string {
-  const headers = ["## 1.", "## 2.", "## 3.", "## 4.", "## 5."];
+  const headers = ["## 1.", "## 2.", "## 3."];
   const start = report.indexOf(headers[sectionNum - 1]);
   if (start === -1) return report;
-  const nextIdx = sectionNum < 5 ? report.indexOf(headers[sectionNum], start + 1) : -1;
+  const nextIdx = sectionNum < 3 ? report.indexOf(headers[sectionNum], start + 1) : -1;
   return nextIdx === -1 ? report.slice(start) : report.slice(start, nextIdx);
 }
 
@@ -67,6 +67,7 @@ export default function ReviewPage() {
   useEffect(() => {
     const contractText = sessionStorage.getItem("contractText");
     const userContext = sessionStorage.getItem("userContext");
+    const contractType = sessionStorage.getItem("contractType");
     const fileNames = sessionStorage.getItem("fileNames");
 
     if (!contractText) {
@@ -84,7 +85,7 @@ export default function ReviewPage() {
         const res = await fetch("/api/review", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ extractedText: contractText, userContext }),
+          body: JSON.stringify({ extractedText: contractText, userContext, contractType }),
         });
 
         if (!res.body) throw new Error("스트림 없음");
@@ -316,7 +317,7 @@ export default function ReviewPage() {
                 className="report-content"
                 dangerouslySetInnerHTML={{
                   __html: renderMarkdown(
-                    activeTab <= 5
+                    activeTab <= 3
                       ? extractSection(finalReport, activeTab)
                       : finalReport
                   ),

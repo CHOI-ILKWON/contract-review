@@ -1,11 +1,13 @@
 import { NextRequest } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import {
+  COMPANY_PRINCIPLES,
   PART1_PRINCIPLES,
   PART3_CHOI,
   PART4_KIM,
   PART5_LEE,
   PART6_FINAL_REPORT,
+  getContractTypeContext,
 } from "@/lib/prompts";
 
 export const runtime = "nodejs";
@@ -45,7 +47,7 @@ async function callClaudeStreaming(
 }
 
 export async function POST(req: NextRequest) {
-  const { extractedText, userContext } = await req.json();
+  const { extractedText, userContext, contractType } = await req.json();
 
   if (!extractedText) {
     return new Response("extractedText가 없습니다.", { status: 400 });
@@ -60,13 +62,15 @@ export async function POST(req: NextRequest) {
       };
 
       try {
-        const baseUserMsg = `[계약서 원문]\n${extractedText}\n\n[참고 정보]\n${userContext || "없음"}`;
+        const contractTypeCtx = getContractTypeContext(contractType || "EPC");
+        const systemBase = COMPANY_PRINCIPLES + "\n\n" + PART1_PRINCIPLES + "\n\n" + contractTypeCtx;
+        const baseUserMsg = `[계약서 원문]\n${extractedText}\n\n[참고 정보]\n${userContext || "없음"}\n\n[계약 유형]\n${contractType || "EPC"}`;
 
         // Stage 1: 기술사 CHOI
         send("stage", { id: "choi", label: "기술사 CHOI", status: "start" });
 
         const choiResult = await callClaudeStreaming(
-          PART1_PRINCIPLES + "\n\n" + PART3_CHOI,
+          systemBase + "\n\n" + PART3_CHOI,
           baseUserMsg,
           (chunk) => send("chunk", { stage: "choi", text: chunk })
         );
@@ -77,7 +81,7 @@ export async function POST(req: NextRequest) {
         send("stage", { id: "kim", label: "변호사 KIM", status: "start" });
 
         const kimResult = await callClaudeStreaming(
-          PART1_PRINCIPLES + "\n\n" + PART4_KIM,
+          systemBase + "\n\n" + PART4_KIM,
           baseUserMsg + "\n\n[기술사 CHOI 검토 결과]\n" + choiResult,
           (chunk) => send("chunk", { stage: "kim", text: chunk })
         );
@@ -88,7 +92,7 @@ export async function POST(req: NextRequest) {
         send("stage", { id: "lee", label: "사업개발자 LEE", status: "start" });
 
         const leeResult = await callClaudeStreaming(
-          PART1_PRINCIPLES + "\n\n" + PART5_LEE,
+          systemBase + "\n\n" + PART5_LEE,
           baseUserMsg +
             "\n\n[기술사 CHOI 검토 결과]\n" +
             choiResult +
@@ -103,7 +107,7 @@ export async function POST(req: NextRequest) {
         send("stage", { id: "meeting", label: "3자 교차 검증 회의", status: "start" });
 
         const finalReport = await callClaudeStreaming(
-          PART1_PRINCIPLES + "\n\n" + PART6_FINAL_REPORT,
+          systemBase + "\n\n" + PART6_FINAL_REPORT,
           baseUserMsg +
             "\n\n[기술사 CHOI 검토 결과]\n" +
             choiResult +
