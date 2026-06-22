@@ -19,7 +19,8 @@ export async function POST(req: NextRequest) {
       const buffer = Buffer.from(await file.arrayBuffer());
 
       if (ext === "pdf") {
-        const pdfParse = (await import("pdf-parse")).default;
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const pdfParse = require("pdf-parse");
         const data = await pdfParse(buffer);
         texts.push(`=== 파일: ${file.name} ===\n${data.text}`);
       } else if (ext === "docx") {
