@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+:root {
+  --pixel-green: #00ff41;
+  --pixel-yellow: #ffd700;
+  --pixel-red: #ff4444;
+  --pixel-blue: #4488ff;
+  --pixel-gray: #888888;
+}
+
+/* 픽셀 아트 폰트 효과 */
+.pixel-text {
+  font-family: "Courier New", monospace;
+  image-rendering: pixelated;
+}
+
+/* 캐릭터 걷기 애니메이션 */
+@keyframes walk {
+  0%   { transform: translateY(0px) scaleX(1); }
+  25%  { transform: translateY(-3px) scaleX(1); }
+  50%  { transform: translateY(0px) scaleX(1); }
+  75%  { transform: translateY(-3px) scaleX(-1); }
+  100% { transform: translateY(0px) scaleX(-1); }
+}
+
+@keyframes blink {
+  0%, 90%, 100% { opacity: 1; }
+  95% { opacity: 0; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-green {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 255, 65, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(0, 255, 65, 0); }
+}
+
+.animate-walk {
+  animation: walk 0.4s ease-in-out infinite;
+}
+
+.animate-blink {
+  animation: blink 3s ease-in-out infinite;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s ease-out forwards;
+}
+
+.animate-pulse-green {
+  animation: pulse-green 1.5s ease-in-out infinite;
+}
+
+/* 스캔라인 효과 */
+.scanline::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.05) 2px,
+    rgba(0, 0, 0, 0.05) 4px
+  );
+  pointer-events: none;
+}
+
+/* 커스텀 스크롤바 */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #1a1a2e; }
+::-webkit-scrollbar-thumb { background: #00ff41; border-radius: 3px; }
+
+/* 마크다운 보고서 스타일 */
+.report-content h1 { font-size: 1.5rem; font-weight: bold; margin: 1.5rem 0 0.75rem; color: #ffd700; }
+.report-content h2 { font-size: 1.25rem; font-weight: bold; margin: 1.25rem 0 0.5rem; color: #00ff41; border-bottom: 1px solid #333; padding-bottom: 0.25rem; }
+.report-content h3 { font-size: 1rem; font-weight: bold; margin: 1rem 0 0.25rem; color: #4488ff; }
+.report-content p { margin: 0.5rem 0; line-height: 1.7; }
+.report-content table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem; }
+.report-content th { background: #1e3a2e; color: #00ff41; padding: 0.5rem; border: 1px solid #2a4a3a; text-align: left; }
+.report-content td { padding: 0.4rem 0.5rem; border: 1px solid #2a3a2a; vertical-align: top; }
+.report-content tr:nth-child(even) td { background: #0d1a0d; }
+.report-content pre { background: #0d0d1a; padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.8rem; border: 1px solid #333; margin: 0.75rem 0; }
+.report-content code { font-family: "Courier New", monospace; font-size: 0.85em; }
+.report-content ul, .report-content ol { margin: 0.5rem 0 0.5rem 1.5rem; }
+.report-content li { margin: 0.25rem 0; }
+.report-content strong { color: #ffd700; }
+.report-content hr { border: none; border-top: 1px solid #333; margin: 1.5rem 0; }
